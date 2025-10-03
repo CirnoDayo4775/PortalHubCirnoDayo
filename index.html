@@ -350,11 +350,6 @@
             title.className = 'card-title card-title-small fw-bold';
             title.textContent = titleText;
 
-            // optional small description under title (use column D if present)
-            const desc = document.createElement('div');
-            desc.className = 'text-muted small mb-2';
-            desc.textContent = "ส่งโดย : " + (dataRow[3] || '').toString().trim();
-
             // long description from column E (index 4) — hidden normally, shown on hover
             const longDesc = document.createElement('div');
             longDesc.className = 'card-long text-muted small';
@@ -376,7 +371,6 @@
             btnWrap.appendChild(btn);
 
             body.appendChild(title);
-            if (desc.textContent) body.appendChild(desc);
             if (longDesc.textContent) body.appendChild(longDesc);
             body.appendChild(btnWrap);
 

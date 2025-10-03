@@ -201,7 +201,6 @@
             function initMenu() {
                 const hamburger = document.getElementById('hamburgerTab');
                 const sideMenu = document.getElementById('sideMenu');
-                const overlay = document.getElementById('menuOverlay');
                 const closeBtn = document.getElementById('closeMenu');
 
                 if (!hamburger || !sideMenu) return; // nothing to do
@@ -219,7 +218,6 @@
                 }
 
                 hamburger.addEventListener('click', openMenu);
-                if (overlay) overlay.addEventListener('click', closeMenuFn);
                 if (closeBtn) closeBtn.addEventListener('click', closeMenuFn);
 
                 document.addEventListener('keydown', function(e){
@@ -282,7 +280,6 @@
                 </p>
             </div>
         </div>
-        <div id="menuOverlay" class="side-menu-overlay"></div>
     </div>
 
     <button id="hamburgerTab" class="hamburger-tab" aria-label="Open menu">

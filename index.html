@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CirnoDayo4775's Portal Hub</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Reserve space for the navbar so content doesn't jump under it */
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .cards-container {
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem;
+            justify-items: center;
+        }
+
+        /* Fixed card size (use min/max to allow expansion but prevent shrink) */
+        .card-item {
+            width: 240px;
+            min-height: 320px; /* ensure it doesn't shrink below this */
+            max-height: 320px; /* clamp to this until hover */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: max-height 0.25s ease;
+        }
+
+        .card-image {
+            height: 140px;
+            background-color: #f3f3f3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-body-flex {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-title-small {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Hover behavior: hide image, reveal long text, and allow expansion */
+        .card-item:hover {
+            max-height: 2000px; /* allow expansion vertically (large max) */
+        }
+
+        .card-item:hover .card-image {
+            display: none;
+        }
+
+        .card-long {
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .card-item:hover .card-long {
+            display: block;
+        }
+
+        /* Bottom drawer menu and hamburger tab styles */
+        .side-menu {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 0;
+            pointer-events: none;
+            z-index: 1050;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center; /* center drawer horizontally */
+        }
+
+        .side-menu-inner {
+            width: calc(100% - 48px);
+            max-width: 720px; /* slightly narrower */
+            /* gradient from light blue to white */
+            background: linear-gradient(180deg, #e6f0ff 0%, #ffffff 100%);
+            color: #0b2a4a; /* dark-blue text for readability */
+            transform: translateY(100%);
+            transition: transform 0.28s ease;
+            box-shadow: 0 -6px 18px rgba(0,0,0,0.12);
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            overflow: auto;
+            margin: 0 12px 12px 12px;
+        }
+
+        .side-menu.open {
+            height: auto;
+            pointer-events: auto;
+        }
+
+        .side-menu.open .side-menu-inner {
+            transform: translateY(0);
+        }
+
+        .side-menu-overlay {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.35);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            pointer-events: none;
+        }
+
+        .side-menu.open .side-menu-overlay {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .hamburger-tab {
+            position: fixed;
+            left: 12px;
+            bottom: 12px;
+            z-index: 1060;
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: #0d6efd;
+            color: #fff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            cursor: pointer;
+        }
+
+        .hamburger-tab .hamburger-icon { font-size: 20px; line-height: 1; }
+
+        /* Hide hamburger when drawer is open */
+        .side-menu.open ~ #hamburgerTab {
+            display: none !important;
+        }
+    </style>
+        
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const clock = document.getElementById('clock');
+            if (clock) {
+                clock.textContent = now.toLocaleTimeString();
+            }
+                // Update date
+                const dateSpan = document.getElementById('date');
+                if (dateSpan) {
+                    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                    dateSpan.textContent = now.toLocaleDateString('en-US', options);
+                }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            updateClock();
+            setInterval(updateClock, 1000);
+        });
+
+    </script>
+    <script>
+        (function(){
+            function initMenu() {
+                const hamburger = document.getElementById('hamburgerTab');
+                const sideMenu = document.getElementById('sideMenu');
+                const overlay = document.getElementById('menuOverlay');
+                const closeBtn = document.getElementById('closeMenu');
+
+                if (!hamburger || !sideMenu) return; // nothing to do
+
+                function openMenu() {
+                    sideMenu.classList.add('open');
+                    sideMenu.setAttribute('aria-hidden', 'false');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeMenuFn() {
+                    sideMenu.classList.remove('open');
+                    sideMenu.setAttribute('aria-hidden', 'true');
+                    document.body.style.overflow = '';
+                }
+
+                hamburger.addEventListener('click', openMenu);
+                if (overlay) overlay.addEventListener('click', closeMenuFn);
+                if (closeBtn) closeBtn.addEventListener('click', closeMenuFn);
+
+                document.addEventListener('keydown', function(e){
+                    if (e.key === 'Escape' && sideMenu.classList.contains('open')) {
+                        closeMenuFn();
+                    }
+                });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initMenu);
+            } else {
+                initMenu();
+            }
+        })();
+    </script>
+</head>
+<body>
+        <!-- Navigation/Header Bar -->
+    <nav class="navbar navbar-expand-lg sticky-top" style="background-color: #111; color: #fff;">
+            <div class="container-fluid justify-content-between align-items-center">
+                <span class="navbar-text text-white fw-bold" style="font-size: 1.1rem;">
+                    <span id="date">September 17, 2025</span>
+                </span>
+                <span class="navbar-brand mx-auto text-white fw-bold" style="font-size: 1.5rem;">CirnoDayo4775's Portal Hub</span>
+                <span class="navbar-text text-white fw-bold" style="font-size: 1.1rem;">
+                    <span id="clock"></span>
+                </span>
+            </div>
+        </nav>
+
+    <main class="cards-container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h5 mb-0">เซิฟที่เข้าถึงได้</h2>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSf9Z7GUBZRSyHDa29h33d6tj46S6p4mHwrLWetW5FonBcpIBw/viewform" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
+                ส่งเซิฟใหม่เข้าเว็ปไซต์
+            </a>
+        </div>
+
+        <div id="message" class="mb-3 text-muted small">มีเพียงข้อมูลที่ยืนยันแล้วเท่านั้นที่จะถูกแสดงบนเว็บไซต์</div>
+
+        <div id="grid" class="card-grid">
+            <!-- cards injected here -->
+        </div>
+    </main>
+
+    <!-- Sliding left menu + hamburger tab -->
+    <div id="sideMenu" class="side-menu" aria-hidden="true">
+        <div class="side-menu-inner">
+            <button id="closeMenu" class="btn-close" aria-label="Close menu" style="position:absolute; right:12px; top:8px; width:40px; height:40px; opacity:1;
+                background:#ffffff; color:#0b2a4a; border-radius:8px; border:none; box-shadow:0 4px 10px rgba(0,0,0,0.12);">
+                ×
+            </button>
+            <div class="p-3">
+                <h1>Donation</h1>
+                <p>สามารถบริจาคค่าดูแลระบบหลังบ้าน และค่าน้ำไฟเจ้าของเว็บได้ที่นี่</p>
+                <img src="Donation.jpg" width="200px">
+                <p>
+                    หมายเหตุ: การบริจาคเป็นเพียงการสนับสนุนเจ้าของเว็บไซต์เท่านั้น ไม่มีผลต่อการแสดงผลหรือการจัดลำดับเซิฟเวอร์บนเว็บไซต์ และจะไม่มีการคืนเงินไม่ว่ากรณีใดๆ
+                </p>
+            </div>
+        </div>
+        <div id="menuOverlay" class="side-menu-overlay"></div>
+    </div>
+
+    <button id="hamburgerTab" class="hamburger-tab" aria-label="Open menu">
+        <span class="hamburger-icon">☰</span>
+    </button>
+
+    <!-- PapaParse for CSV parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script>
+        // Quick helper to build a card element
+        function createCard(dataRow, headers) {
+            // Column mapping (0-based): B=1 (link), C=2 (title), F=5 (image)
+            const link = (dataRow[1] || '').toString().trim();
+            const titleText = (dataRow[2] || '').toString().trim() || 'Untitled';
+            const imgUrl = (dataRow[5] || '').toString().trim();
+
+            const card = document.createElement('div');
+            card.className = 'card card-item shadow-sm';
+
+            // Image container (keeps space even if no image)
+            const imgDiv = document.createElement('div');
+            imgDiv.className = 'card-image';
+            if (imgUrl) {
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.alt = titleText;
+                imgDiv.appendChild(img);
+            } else {
+                // placeholder space
+                const placeholder = document.createElement('div');
+                placeholder.style.width = '100%';
+                placeholder.style.height = '100%';
+                imgDiv.appendChild(placeholder);
+            }
+
+            const body = document.createElement('div');
+            body.className = 'card-body card-body-flex p-3';
+
+            const title = document.createElement('div');
+            title.className = 'card-title card-title-small fw-bold';
+            title.textContent = titleText;
+
+            // optional small description under title (use column D if present)
+            const desc = document.createElement('div');
+            desc.className = 'text-muted small mb-2';
+            desc.textContent = "ส่งโดย : " + (dataRow[3] || '').toString().trim();
+
+            // long description from column E (index 4) — hidden normally, shown on hover
+            const longDesc = document.createElement('div');
+            longDesc.className = 'card-long text-muted small';
+            longDesc.textContent = (dataRow[4] || '').toString().trim();
+
+            // Button area
+            const btnWrap = document.createElement('div');
+            btnWrap.className = 'd-flex justify-content-center mt-2';
+            const btn = document.createElement('a');
+            btn.className = 'btn btn-primary btn-sm';
+            btn.textContent = 'Join';
+            btn.href = link || '#';
+            btn.target = '_blank';
+            btn.rel = 'noopener noreferrer';
+            if (!link) {
+                btn.classList.add('disabled');
+                btn.setAttribute('aria-disabled', 'true');
+            }
+            btnWrap.appendChild(btn);
+
+            body.appendChild(title);
+            if (desc.textContent) body.appendChild(desc);
+            if (longDesc.textContent) body.appendChild(longDesc);
+            body.appendChild(btnWrap);
+
+            card.appendChild(imgDiv);
+            card.appendChild(body);
+            return card;
+        }
+
+        // Parse CSV text and return array of rows (including header)
+        function parseCsvText(csvText) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(csvText, {
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        resolve(results.data);
+                    },
+                    error: function(err) { reject(err); }
+                });
+            });
+        }
+
+        async function loadAndRender(url) {
+            const grid = document.getElementById('grid');
+            const message = document.getElementById('message');
+            grid.innerHTML = '';
+            message.textContent = 'กำลังค้นหา...';
+
+            try {
+                // Fixed Google Sheet provided by the user. Convert to CSV export URL and preserve gid.
+                // Original sheet: https://docs.google.com/spreadsheets/d/1EEPbzeh7-RFGceq-xxC_R5qTJbqpKw2dC3mIXWPn4Ng/edit?resourcekey=&gid=1755540627#gid=1755540627
+                const SHEET_ID = '1EEPbzeh7-RFGceq-xxC_R5qTJbqpKw2dC3mIXWPn4Ng';
+                const GID = '1755540627';
+                const csvExport = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
+                const resp = await fetch(csvExport);
+                if (!resp.ok) throw new Error('Failed to fetch CSV: ' + resp.statusText);
+                const text = await resp.text();
+                const rows = await parseCsvText(text);
+                renderRows(rows);
+                message.textContent = `พบทั้งหมด ${Math.max(0, rows.length - 1)} เซิฟเวอร์ ณ ขณะนี้`;
+            } catch (err) {
+                console.error(err);
+                message.textContent = 'Error loading sheet: ' + err.message;
+            }
+        }
+
+        // rows: array of arrays; first row assumed header if there are non-empty strings
+        function renderRows(rows) {
+            const grid = document.getElementById('grid');
+            if (!rows || rows.length === 0) {
+                grid.innerHTML = '<div class="text-muted">No data</div>';
+                return;
+            }
+
+            const header = rows[0];
+            const data = rows.slice(1);
+            // Column I is index 8 (0-based). Filter rows where column I equals 'Online' (case-insensitive)
+            const filtered = data.filter(r => {
+                const v = (r[8] || '').toString().trim().toLowerCase();
+                return v === 'online';
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="text-muted">No online items found.</div>';
+                return;
+            }
+
+            // Create cards
+            for (const row of filtered) {
+                const card = createCard(row, header);
+                grid.appendChild(card);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-load the fixed Google Sheet
+            loadAndRender();
+        });
+    </script>
+</body>
+</html>

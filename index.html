@@ -437,7 +437,9 @@
                 return;
             }
 
-            // Create cards
+            // Create cards (display newest rows first)
+            // The sheet usually lists oldest entries first; reverse so last row renders first
+            filtered.reverse();
             for (const row of filtered) {
                 const card = createCard(row, header);
                 grid.appendChild(card);

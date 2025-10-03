@@ -48,8 +48,11 @@
         [data-theme="dark"] .card-item .card-title-small,
         [data-theme="dark"] .card-item .card-long,
         [data-theme="dark"] .card-item .btn,
-        [data-theme="dark"] .card-item .img-fallback {
-            color: #ffffff;
+        [data-theme="dark"] .card-item .img-fallback,
+        /* force muted/long descriptions to light color in dark mode */
+        [data-theme="dark"] .card-item .text-muted,
+        [data-theme="dark"] .card-item .card-long {
+            color: #ffffff !important;
         }
 
         /* Make buttons stand out in dark mode */

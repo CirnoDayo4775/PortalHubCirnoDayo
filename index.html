@@ -406,7 +406,7 @@
                 const text = await resp.text();
                 const rows = await parseCsvText(text);
                 renderRows(rows);
-                message.textContent = `พบทั้งหมด ${Math.max(0, rows.length - 1)} เซิฟเวอร์ ณ ขณะนี้`;
+                message.textContent = ``;
             } catch (err) {
                 console.error(err);
                 message.textContent = 'Error loading sheet: ' + err.message;

@@ -285,7 +285,26 @@
             // Column mapping (0-based): B=1 (link), C=2 (title), F=5 (image)
             const link = (dataRow[1] || '').toString().trim();
             const titleText = (dataRow[2] || '').toString().trim() || 'Untitled';
-            const imgUrl = (dataRow[5] || '').toString().trim();
+            // raw image link from column F
+            const rawImg = (dataRow[5] || '').toString().trim();
+            let imgUrl = rawImg;
+            if (imgUrl) {
+                // Convert common Google Drive share forms to /file/d/ID/view
+                // Examples handled:
+                // - https://drive.google.com/open?id=ID
+                // - https://drive.google.com/file/d/ID/view?usp=sharing
+                // - https://drive.google.com/uc?id=ID&export=download
+                const mFile = imgUrl.match(/file\/d\/([^\/\?&]+)/);
+                const mOpen = imgUrl.match(/[?&]id=([^&]+)/);
+                const mUc = imgUrl.match(/uc\?id=([^&]+)/);
+                if (mFile) {
+                    imgUrl = `https://drive.google.com/file/d/${mFile[1]}/view`;
+                } else if (mOpen) {
+                    imgUrl = `https://drive.google.com/file/d/${mOpen[1]}/view`;
+                } else if (mUc) {
+                    imgUrl = `https://drive.google.com/file/d/${mUc[1]}/view`;
+                }
+            }
 
             const card = document.createElement('div');
             card.className = 'card card-item shadow-sm';
